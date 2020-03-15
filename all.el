@@ -43,6 +43,8 @@
 
 ;;; Code:
 
+(require 'linum)
+
 (defgroup all nil
   "Edit all lines matching a given regexp"
   :group 'matching)
@@ -116,6 +118,26 @@ Change is FROM TO, change length is LENGTH."
                (delete-region pos (+ pos length))
                (insert-buffer-substring buffer from to)))))))
 
+(defun all-make-lineno-overlay (lineno)
+  "Add LINENO like `linum'."
+  (let ((fmt (format
+              "%%%dd"
+              (with-current-buffer all-buffer
+                (ceiling (log (line-number-at-pos (point-max) 'absolute) 10)))))
+        (ov (make-overlay (point) (point))))
+    (overlay-put ov 'before-string
+                 (concat
+                  (propertize (format fmt lineno) 'face 'linum)
+                  (propertize " " 'display `((margin left-margin)))))
+    ov))
+
+(defun all-make-lineno-overlays-from-here (to lineno)
+  "Add LINENO like `linum' to TO."
+  (all-make-lineno-overlay lineno)
+  (while (search-forward "\n" (1- to) t)
+    (setq lineno (1+ lineno))
+    (all-make-lineno-overlay lineno)))
+
 (defun all-insert (start end regexp nlines)
   "Insert match.
 Match is region START to END.
@@ -124,10 +146,12 @@ NLINES is each regexp line count."
   (let ((marker (copy-marker start))
         (buffer (current-buffer)))
     (with-current-buffer standard-output
-      (let ((from (point))
-            to)
+      (let ((from (point)) to)
         (insert-buffer-substring buffer start end)
         (setq to (point))
+        (goto-char from)
+        (all-make-lineno-overlays-from-here
+         to (with-current-buffer buffer (line-number-at-pos start)))
         (overlay-put (make-overlay from to) 'all-marker marker)
         (goto-char from)
         (while (re-search-forward regexp to t)
