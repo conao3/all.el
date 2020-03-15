@@ -174,10 +174,11 @@ Any changes made in that buffer will be propagated to this buffer."
       (with-current-buffer standard-output
         (all-mode)
         (setq all-buffer buffer)
-        (insert "Lines matching ")
-        (prin1 regexp)
-        (insert " in buffer " (buffer-name buffer) ?. ?\n)
-        (insert "--------\n"))
+        (insert
+         (format
+          "Lines matching %s in buffer %s.\n--------\n"
+          (prin1-to-string regexp)
+          (buffer-name buffer))))
       (when (eq buffer standard-output)
         (goto-char (point-max)))
       (save-excursion
