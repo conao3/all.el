@@ -55,9 +55,19 @@
 
 (defvar all-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-x h")   'all-mark-whole-contents)
     (define-key map (kbd "C-c C-k") 'quit-window)
     (define-key map (kbd "C-c C-c") 'all-mode-goto)
     map))
+
+(defun all-mark-whole-contents ()
+  "Mark whole contents in *All* buffer except header."
+  (interactive)
+  (goto-char (point-max))
+  (push-mark)
+  (goto-char (point-min))
+  (search-forward "--------\n" nil t)
+  (setq mark-active t))
 
 (defun all-mode-find (pos)
   "Find position in original buffer corresponding to POS."
