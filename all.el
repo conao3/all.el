@@ -53,8 +53,7 @@
     (define-key map "\C-c\C-c" 'all-mode-goto)
     map))
 
-(defvar all-buffer nil)
-(make-variable-buffer-local 'all-buffer)
+(defvar-local all-buffer nil)
 
 (define-derived-mode all-mode fundamental-mode "All"
   "Major mode for output from \\[all].
