@@ -38,7 +38,6 @@
 
 ;; Some limitations:
 
-;; - Undo in the *All* buffer is an ordinary change in the original.
 ;; - Changes to the original buffer are not reflected in the *All* buffer.
 ;; - A single change in the *All* buffer must be limited to a single match.
 
@@ -173,6 +172,7 @@ Any changes made in that buffer will be propagated to this buffer."
     (with-output-to-temp-buffer "*All*"
       (with-current-buffer standard-output
         (all-mode)
+        (buffer-enable-undo)
         (setq all-buffer buffer)
         (insert
          (format
