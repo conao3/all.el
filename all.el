@@ -100,12 +100,12 @@ Change is FROM TO, change length is LENGTH."
        (null all-initialization-p)
        (let ((buffer (current-buffer))
              (pos (all-mode-find from)))
-         (if pos
-             (with-current-buffer all-buffer
-               (save-excursion
-                 (goto-char pos)
-                 (delete-region pos (+ pos length))
-                 (insert-buffer-substring buffer from to)))))))
+         (when pos
+           (with-current-buffer all-buffer
+             (save-excursion
+               (goto-char pos)
+               (delete-region pos (+ pos length))
+               (insert-buffer-substring buffer from to)))))))
 
 (defun all-insert (start end regexp nlines)
   "Insert match.
@@ -125,8 +125,8 @@ NLINES is each regexp line count."
           (put-text-property (match-beginning 0) (match-end 0)
                              'face 'match))
         (goto-char to)
-        (if (> nlines 0)
-            (insert "--------\n"))))))
+        (when (> nlines 0)
+          (insert "--------\n"))))))
 
 
 ;;; main
@@ -162,7 +162,8 @@ Any changes made in that buffer will be propagated to this buffer."
                                 ": ")
                         nil 'regexp-history default))
          current-prefix-arg))
-  (setq nlines (if nlines (prefix-numeric-value nlines)
+  (setq nlines (if nlines
+                   (prefix-numeric-value nlines)
                  list-matching-lines-default-context-lines))
   (let ((all-initialization-p t)
         (buffer (current-buffer))
@@ -177,8 +178,8 @@ Any changes made in that buffer will be propagated to this buffer."
         (prin1 regexp)
         (insert " in buffer " (buffer-name buffer) ?. ?\n)
         (insert "--------\n"))
-      (if (eq buffer standard-output)
-          (goto-char (point-max)))
+      (when (eq buffer standard-output)
+        (goto-char (point-max)))
       (save-excursion
         (goto-char (point-min))
         ;; Find next match, but give up if prev match was at end of buffer.
@@ -190,7 +191,9 @@ Any changes made in that buffer will be propagated to this buffer."
           (goto-char (match-end 0))
           (let* ((start (save-excursion
                           (goto-char (match-beginning 0))
-                          (forward-line (if (< nlines 0) nlines (- nlines)))
+                          (forward-line (if (< nlines 0)
+                                            nlines
+                                          (- nlines)))
                           (point)))
                  (end (save-excursion
                         (goto-char (match-end 0))
@@ -199,16 +202,16 @@ Any changes made in that buffer will be propagated to this buffer."
                           (forward-line 1))
                         (point))))
             (cond ((null prevend)
-                   (setq prevstart start
-                         prevend end))
+                   (setq prevstart start)
+                   (setq prevend end))
                   ((> start prevend)
                    (all-insert prevstart prevend regexp nlines)
-                   (setq prevstart start
-                         prevend end))
+                   (setq prevstart start)
+                   (setq prevend end))
                   (t
                    (setq prevend end)))))
-        (if prevend
-            (all-insert prevstart prevend regexp nlines))))))
+        (when prevend
+          (all-insert prevstart prevend regexp nlines))))))
 
 (provide 'all)
 
