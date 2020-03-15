@@ -53,9 +53,11 @@
 
 (defvar all-initialization-p nil)
 (defvar-local all-buffer nil)
+
 (defvar all-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'all-mode-goto)
+    (define-key map (kbd "C-c C-k") 'quit-window)
+    (define-key map (kbd "C-c C-c") 'all-mode-goto)
     map))
 
 (defun all-mode-find (pos)
