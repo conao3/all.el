@@ -48,22 +48,15 @@
   "Edit all lines matching a given regexp"
   :group 'matching)
 
+
+;;; function
+
+(defvar all-initialization-p nil)
+(defvar-local all-buffer nil)
 (defvar all-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-c" 'all-mode-goto)
     map))
-
-(defvar-local all-buffer nil)
-
-(define-derived-mode all-mode fundamental-mode "All"
-  "Major mode for output from \\[all].
-
-All changes made in this buffer will be propagated to the buffer where
-you ran \\[all].
-
-Press \\[all-mode-goto] to go to the same spot in the original buffer."
-  (add-hook 'before-change-functions 'all-before-change-function nil 'local)
-  (add-hook 'after-change-functions 'all-after-change-function nil 'local))
 
 (defun all-mode-find (pos)
   "Find position in original buffer corresponding to POS."
@@ -88,8 +81,6 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
       (error "This text is not from the original buffer"))
     (goto-char pos)))
 
-(defvar all-initialization-p nil)
-
 (defun all-before-change-function (from to)
   "Check that change is legal.
 Find overlay FROM TO."
@@ -113,6 +104,40 @@ Change is FROM TO, change length is LENGTH."
                  (goto-char pos)
                  (delete-region pos (+ pos length))
                  (insert-buffer-substring buffer from to)))))))
+
+(defun all-insert (start end regexp nlines)
+  "Insert match.
+Match is region START to END.
+REGEXP is target regexp.
+NLINES is each regexp line count."
+  (let ((marker (copy-marker start))
+        (buffer (current-buffer)))
+    (with-current-buffer standard-output
+      (let ((from (point))
+            to)
+        (insert-buffer-substring buffer start end)
+        (setq to (point))
+        (overlay-put (make-overlay from to) 'all-marker marker)
+        (goto-char from)
+        (while (re-search-forward regexp to t)
+          (put-text-property (match-beginning 0) (match-end 0)
+                             'face 'match))
+        (goto-char to)
+        (if (> nlines 0)
+            (insert "--------\n"))))))
+
+
+;;; main
+
+(define-derived-mode all-mode fundamental-mode "All"
+  "Major mode for output from \\[all].
+
+All changes made in this buffer will be propagated to the buffer where
+you ran \\[all].
+
+Press \\[all-mode-goto] to go to the same spot in the original buffer."
+  (add-hook 'before-change-functions 'all-before-change-function nil 'local)
+  (add-hook 'after-change-functions 'all-after-change-function nil 'local))
 
 ;;;###autoload
 (defun all (regexp &optional nlines)
@@ -183,27 +208,6 @@ Any changes made in that buffer will be propagated to this buffer."
                    (setq prevend end)))))
         (if prevend
             (all-insert prevstart prevend regexp nlines))))))
-
-(defun all-insert (start end regexp nlines)
-  "Insert match.
-Match is region START to END.
-REGEXP is target regexp.
-NLINES is each regexp line count."
-  (let ((marker (copy-marker start))
-        (buffer (current-buffer)))
-    (with-current-buffer standard-output
-      (let ((from (point))
-            to)
-        (insert-buffer-substring buffer start end)
-        (setq to (point))
-        (overlay-put (make-overlay from to) 'all-marker marker)
-        (goto-char from)
-        (while (re-search-forward regexp to t)
-          (put-text-property (match-beginning 0) (match-end 0)
-                             'face 'match))
-        (goto-char to)
-        (if (> nlines 0)
-            (insert "--------\n"))))))
 
 (provide 'all)
 
