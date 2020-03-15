@@ -179,6 +179,7 @@ Any changes made in that buffer will be propagated to this buffer."
         (prevend nil)
         (prevstart nil)
         (prevpos (point-min)))
+    (kill-buffer "*All*")
     (with-output-to-temp-buffer "*All*"
       (with-current-buffer standard-output
         (all-mode)
