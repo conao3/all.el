@@ -44,6 +44,10 @@
 
 ;;; Code:
 
+(defgroup all nil
+  "Edit all lines matching a given regexp"
+  :group 'matching)
+
 (defvar all-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-c" 'all-mode-goto)
