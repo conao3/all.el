@@ -15,7 +15,7 @@
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
 ;; any later version.
-;; 
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -44,7 +44,7 @@
 ;; - Changes to the original buffer are not reflected in the *All* buffer.
 ;; - A single change in the *All* buffer must be limited to a single match.
 
-;;; Code: 
+;;; Code:
 
 (defvar all-mode-map
   (let ((map (make-sparse-keymap)))
@@ -68,8 +68,8 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
   ;; Find position in original buffer corresponding to POS.
   (let ((overlay (all-mode-find-overlay pos)))
     (if overlay
-	(+ (marker-position (overlay-get overlay 'all-marker))
-	   (- pos (overlay-start overlay))))))
+        (+ (marker-position (overlay-get overlay 'all-marker))
+           (- pos (overlay-start overlay))))))
 
 (defun all-mode-find-overlay (pos)
   ;; Find the overlay containing POS.
@@ -83,7 +83,7 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
   (interactive)
   (let ((pos (all-mode-find (point))))
     (if pos
-	(pop-to-buffer all-buffer)
+        (pop-to-buffer all-buffer)
       (error "This text is not from the original buffer"))
     (goto-char pos)))
 
@@ -94,8 +94,8 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
   (and all-buffer
        (not all-initialization-p)
        (let ((start (all-mode-find-overlay from))
-	     (end (all-mode-find-overlay to)))
-	 (not (and start (eq start end))))
+             (end (all-mode-find-overlay to)))
+         (not (and start (eq start end))))
        (error "Changes should be limited to a single text piece")))
 
 (defun all-after-change-function (from to length)
@@ -103,13 +103,13 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
   (and all-buffer
        (null all-initialization-p)
        (let ((buffer (current-buffer))
-	     (pos (all-mode-find from)))
-	 (if pos
-	     (with-current-buffer all-buffer
-	       (save-excursion
-		 (goto-char pos)
+             (pos (all-mode-find from)))
+         (if pos
+             (with-current-buffer all-buffer
+               (save-excursion
+                 (goto-char pos)
                  (delete-region pos (+ pos length))
-		 (insert-buffer-substring buffer from to)))))))
+                 (insert-buffer-substring buffer from to)))))))
 
 ;;;###autoload
 (defun all (regexp &optional nlines)
@@ -128,58 +128,58 @@ Any changes made in that buffer will be propagated to this buffer."
    (list (let* ((default (car regexp-history)))
            (read-string
             (if default
-                (format 
+                (format
                  "Edit lines matching regexp (default `%s'): " default)
               "Edit lines matching regexp: ")
             nil 'regexp-history default))
          current-prefix-arg))
   (setq nlines (if nlines (prefix-numeric-value nlines)
-		 list-matching-lines-default-context-lines))
+                 list-matching-lines-default-context-lines))
   (let ((all-initialization-p t)
         (buffer (current-buffer))
-	(prevend nil)
-	(prevstart nil)
-	(prevpos (point-min)))
+        (prevend nil)
+        (prevstart nil)
+        (prevpos (point-min)))
     (with-output-to-temp-buffer "*All*"
       (with-current-buffer standard-output
-	(all-mode)
-	(setq all-buffer buffer)
-	(insert "Lines matching ")
-	(prin1 regexp)
-	(insert " in buffer " (buffer-name buffer) ?. ?\n)
-	(insert "--------\n"))
+        (all-mode)
+        (setq all-buffer buffer)
+        (insert "Lines matching ")
+        (prin1 regexp)
+        (insert " in buffer " (buffer-name buffer) ?. ?\n)
+        (insert "--------\n"))
       (if (eq buffer standard-output)
-	  (goto-char (point-max)))
+          (goto-char (point-max)))
       (save-excursion
-	(goto-char (point-min))
-	;; Find next match, but give up if prev match was at end of buffer.
-	(while (and (not (= prevpos (point-max)))
-		    (re-search-forward regexp nil t))
-	  (goto-char (match-beginning 0))
-	  (beginning-of-line)
-	  (setq prevpos (point))
-	  (goto-char (match-end 0))
-	  (let* ((start (save-excursion
-			  (goto-char (match-beginning 0))
-			  (forward-line (if (< nlines 0) nlines (- nlines)))
-			  (point)))
-		 (end (save-excursion
-			(goto-char (match-end 0))
-			(if (> nlines 0)
-			    (forward-line (1+ nlines))
-			    (forward-line 1))
-			(point))))
-	    (cond ((null prevend)
-		   (setq prevstart start
-			prevend end))
-		  ((> start prevend)
-		   (all-insert prevstart prevend regexp nlines)
-		   (setq prevstart start
-			 prevend end))
-		  (t
-		   (setq prevend end)))))
-	(if prevend
-	    (all-insert prevstart prevend regexp nlines))))))
+        (goto-char (point-min))
+        ;; Find next match, but give up if prev match was at end of buffer.
+        (while (and (not (= prevpos (point-max)))
+                    (re-search-forward regexp nil t))
+          (goto-char (match-beginning 0))
+          (beginning-of-line)
+          (setq prevpos (point))
+          (goto-char (match-end 0))
+          (let* ((start (save-excursion
+                          (goto-char (match-beginning 0))
+                          (forward-line (if (< nlines 0) nlines (- nlines)))
+                          (point)))
+                 (end (save-excursion
+                        (goto-char (match-end 0))
+                        (if (> nlines 0)
+                            (forward-line (1+ nlines))
+                          (forward-line 1))
+                        (point))))
+            (cond ((null prevend)
+                   (setq prevstart start
+                         prevend end))
+                  ((> start prevend)
+                   (all-insert prevstart prevend regexp nlines)
+                   (setq prevstart start
+                         prevend end))
+                  (t
+                   (setq prevend end)))))
+        (if prevend
+            (all-insert prevstart prevend regexp nlines))))))
 
 (defun all-insert (start end regexp nlines)
   ;; Insert match.
