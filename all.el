@@ -155,13 +155,12 @@ Interactively it is the prefix arg.
 The lines are shown in a buffer named `*All*'.
 Any changes made in that buffer will be propagated to this buffer."
   (interactive
-   (list (let* ((default (car regexp-history)))
-           (read-string
-            (if default
-                (format
-                 "Edit lines matching regexp (default `%s'): " default)
-              "Edit lines matching regexp: ")
-            nil 'regexp-history default))
+   (list (let ((default (car regexp-history)))
+           (read-string (concat "Edit lines matching regexp"
+                                (when default
+                                  (format " (default `%s')" default))
+                                ": ")
+                        nil 'regexp-history default))
          current-prefix-arg))
   (setq nlines (if nlines (prefix-numeric-value nlines)
                  list-matching-lines-default-context-lines))
