@@ -60,14 +60,14 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
   (add-hook 'after-change-functions 'all-after-change-function nil 'local))
 
 (defun all-mode-find (pos)
-  ;; Find position in original buffer corresponding to POS.
+  "Find position in original buffer corresponding to POS."
   (let ((overlay (all-mode-find-overlay pos)))
     (if overlay
         (+ (marker-position (overlay-get overlay 'all-marker))
            (- pos (overlay-start overlay))))))
 
 (defun all-mode-find-overlay (pos)
-  ;; Find the overlay containing POS.
+  "Find the overlay containing POS."
   (let ((overlays (overlays-at pos)))
     (while (and overlays (null (overlay-get (car overlays) 'all-marker)))
       (setq overlays (cdr overlays)))
@@ -85,7 +85,8 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
 (defvar all-initialization-p nil)
 
 (defun all-before-change-function (from to)
-  ;; Check that change is legal.
+  "Check that change is legal.
+Find overlay FROM TO."
   (and all-buffer
        (not all-initialization-p)
        (let ((start (all-mode-find-overlay from))
@@ -94,7 +95,8 @@ Press \\[all-mode-goto] to go to the same spot in the original buffer."
        (error "Changes should be limited to a single text piece")))
 
 (defun all-after-change-function (from to length)
-  ;; Propagate changes from *All* buffer.
+  "Propagate change from *All* buffer.
+Change is FROM TO, change length is LENGTH."
   (and all-buffer
        (null all-initialization-p)
        (let ((buffer (current-buffer))
@@ -177,7 +179,10 @@ Any changes made in that buffer will be propagated to this buffer."
             (all-insert prevstart prevend regexp nlines))))))
 
 (defun all-insert (start end regexp nlines)
-  ;; Insert match.
+  "Insert match.
+Match is region START to END.
+REGEXP is target regexp.
+NLINES is each regexp line count."
   (let ((marker (copy-marker start))
         (buffer (current-buffer)))
     (with-current-buffer standard-output
