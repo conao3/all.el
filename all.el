@@ -6,11 +6,6 @@
 ;; Version: 1.0
 ;; Keywords: matching
 
-;; LCD Archive Entry:
-;; all|Per Abrahamsen|abraham@dina.kvl.dk|
-;; Edit all lines matching a given regexp|
-;; $Date: 1997/03/04 10:29:42 $|$Revision: 5.2 $|~/misc/all.Z|
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
