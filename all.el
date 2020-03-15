@@ -1,11 +1,14 @@
-;;; all.el --- Edit all lines matching a given regexp
+;;; all.el --- Edit all lines matching a given regexp  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 1985-1987,1992,1994,2011-2012 Free Software Foundation, Inc.
 ;; Copyright (C) 2020  Naoya Yamashita
 
 ;; Author: Per Abrahamsen <abraham@dina.kvl.dk>
-;; Version: 1.0
+;; Maintainer: Naoya Yamashita <conao3@gmail.com>
 ;; Keywords: matching
+;; Version: 1.0
+;; URL: https://github.com/conao3/all.el
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
